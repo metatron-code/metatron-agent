@@ -28,7 +28,10 @@ jobs:
 
       - name: Setup Snapcraft
         run: |
-          sudo snap install snapcraft --classic
+          apt update
+          apt -yq --no-install-suggests --no-install-recommends install snapcraft
+          mkdir -p $HOME/.cache/snapcraft/download
+          mkdir -p $HOME/.cache/snapcraft/stage-packages
 
       - uses: goreleaser/goreleaser-action@v4
         with:
