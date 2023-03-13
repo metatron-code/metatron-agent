@@ -27,9 +27,6 @@ changelog:
 checksum:
   disable: true
 
-archives:
-  - format: binary
-
 snapcrafts:
   - builds:
       - agent
