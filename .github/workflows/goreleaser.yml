@@ -11,6 +11,8 @@ permissions:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    env:
+      SNAPCRAFT_STORE_CREDENTIALS: ${{secrets.SNAPCRAFT_TOKEN}}
 
     steps:
       - uses: actions/checkout@v3
@@ -27,10 +29,6 @@ jobs:
       - name: Setup Snapcraft
         run: |
           sudo snap install snapcraft --classic
-          echo $SNAPCRAFT_TOKEN | snapcraft login --with -
-        env:
-          SNAPCRAFT_TOKEN: ${{secrets.SNAPCRAFT_TOKEN}}
-          SNAPCRAFT_BUILD_ENVIRONMENT: host
 
       - uses: goreleaser/goreleaser-action@v4
         with:
