@@ -13,6 +13,8 @@ builds:
       - arm64
     goarm:
       - '7'
+    ldflags:
+      - -s -w
 
 changelog:
   sort: asc
