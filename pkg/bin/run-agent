@@ -1,0 +1,13 @@
+#!/bin/sh
+# https://github.com/snapcore/snapweb/blob/master/pkg/snapweb
+
+set -e
+
+if [ ! -f ${SNAP}/bin/agent-${SNAP_ARCH} ]; then
+    echo "${SNAP_ARCH} not supported."
+    exit 1
+fi
+
+exec ${SNAP}/bin/agent-${SNAP_ARCH}
+echo "STARTED"
+exit 1
