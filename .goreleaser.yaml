@@ -1,0 +1,44 @@
+before:
+  hooks:
+    - go mod tidy -v
+builds:
+  - id: "agent"
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - '7'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+snapcrafts:
+  - builds:
+      - agent
+    name: metatron
+    summary: Global Monitoring Agent
+    description: |
+      Monitoring agent for distributed checks.
+      Designed to research the structure of the Internet.
+    channel_templates:
+      - stable
+    grade: stable
+    confinement: strict
+    publish: true
+    apps:
+      agent:
+        daemon: simple
+        command: metatron-agent
+        restart_condition: "always"
+        plugs:
+          - network
+          - network-bind
