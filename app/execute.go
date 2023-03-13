@@ -1,9 +1,15 @@
 package app
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
 func (app *App) Execute() error {
 	log.Println("Your HW-UID:", app.agentUUID.String())
 
-	return nil
+	for {
+		time.Sleep(1)
+	}
+
 }
