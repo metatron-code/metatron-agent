@@ -26,10 +26,11 @@ func main() {
 
 	agent, err := app.New()
 	if err != nil {
-		log.Fatal("error app initialization:", err)
+		log.Println("error app initialization:", err)
+		return
 	}
 
 	if err := agent.Execute(); err != nil {
-		log.Fatal("error execute app:", err)
+		log.Println("error execute app:", err)
 	}
 }
