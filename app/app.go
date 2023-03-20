@@ -2,23 +2,26 @@ package app
 
 import (
 	"os"
-	"path"
 	"runtime"
 
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/getsentry/sentry-go"
-	"github.com/google/uuid"
 )
 
 type App struct {
-	agentUUID uuid.UUID
+	config       config
+	rootFilePath string
+	cvmAddress   string
+	mqtt         mqtt.Client
 }
 
 func New() (*App, error) {
 	app := &App{
-		agentUUID: uuid.New(),
+		cvmAddress: "cvm-prod.metatron.get-server.net",
 	}
 
-	rootPath, okRootPath := os.LookupEnv("SNAP_COMMON")
+	var okRootPath bool
+	app.rootFilePath, okRootPath = os.LookupEnv("SNAP_COMMON")
 	if !okRootPath {
 		return nil, errorRunSnapd
 	}
@@ -27,7 +30,7 @@ func New() (*App, error) {
 		return nil, errorRunSnapd
 	}
 
-	if err := app.loadAgentID(rootPath); err != nil {
+	if err := app.loadBaseConfig(); err != nil {
 		return nil, err
 	}
 
@@ -51,44 +54,9 @@ func New() (*App, error) {
 		})
 
 		scope.SetUser(sentry.User{
-			ID: app.agentUUID.String(),
+			ID: app.config.AgentUUID.String(),
 		})
 	})
 
 	return app, nil
-}
-
-func (app *App) loadAgentID(rootPath string) error {
-	uidPath := path.Join(rootPath, "hw.uid")
-
-	if _, err := os.Stat(uidPath); os.IsNotExist(err) {
-		uidDataNew, err := uuid.NewUUID()
-		if err != nil {
-			return err
-		}
-
-		uidDataText, err := uidDataNew.MarshalText()
-		if err != nil {
-			return err
-		}
-
-		if err := os.WriteFile(uidPath, uidDataText, 0600); err != nil {
-			if err != nil {
-				return err
-			}
-		}
-
-	} else {
-		uidData, err := os.ReadFile(uidPath)
-		if err != nil {
-			return err
-		}
-
-		if err := app.agentUUID.UnmarshalText(uidData); err != nil {
-			return err
-		}
-
-	}
-
-	return nil
 }
