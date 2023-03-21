@@ -13,11 +13,18 @@ type App struct {
 	rootFilePath string
 	cvmAddress   string
 	mqtt         mqtt.Client
+
+	metaVersion string
+	metaCommit  string
+	metaDate    string
 }
 
-func New() (*App, error) {
+func New(version, commit, date string) (*App, error) {
 	app := &App{
-		cvmAddress: "cvm-prod.metatron.get-server.net",
+		cvmAddress:  "cvm-prod.metatron.get-server.net",
+		metaVersion: version,
+		metaCommit:  commit,
+		metaDate:    date,
 	}
 
 	var okRootPath bool
@@ -49,8 +56,10 @@ func New() (*App, error) {
 
 	sentry.ConfigureScope(func(scope *sentry.Scope) {
 		scope.SetTags(map[string]string{
-			"OS":   runtime.GOOS,
-			"ARCH": runtime.GOARCH,
+			"OS":      runtime.GOOS,
+			"ARCH":    runtime.GOARCH,
+			"Version": version,
+			"Commit":  commit,
 		})
 
 		scope.SetUser(sentry.User{
