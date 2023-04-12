@@ -27,6 +27,8 @@ func main() {
 		err := recover()
 
 		if err != nil {
+			log.Println("global error:", err)
+
 			sentry.CurrentHub().Recover(err)
 			sentry.Flush(2 * time.Second)
 		}
