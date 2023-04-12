@@ -71,6 +71,9 @@ func (app *App) loadAuthConfig() (map[string]string, error) {
 
 func (app *App) requestAuthConfig() (map[string]string, error) {
 	sign, err := app.getAuthRequestSign()
+	if err != nil {
+		return nil, err
+	}
 
 	values := url.Values{}
 	values.Add("version", app.metaVersion)
