@@ -33,6 +33,6 @@ func (app *App) newMQTTClient(conf map[string]string) mqtt.Client {
 	return mqtt.NewClient(copts)
 }
 
-func (app *App) mqttOnConnect(client mqtt.Client) {
+func (app *App) mqttOnConnect(_ mqtt.Client) {
 	log.Println("mqtt connected")
 }
