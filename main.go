@@ -10,10 +10,11 @@ import (
 )
 
 var (
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
-	signKey = "none"
+	version   = "dev"
+	commit    = "none"
+	date      = "unknown"
+	signKey   = "none"
+	sentryDsn = ""
 )
 
 func init() {
@@ -31,7 +32,7 @@ func main() {
 		}
 	}()
 
-	agent, err := app.New(version, commit, date, signKey)
+	agent, err := app.New(version, commit, date, signKey, sentryDsn)
 	if err != nil {
 		log.Println("error app initialization:", err)
 		return

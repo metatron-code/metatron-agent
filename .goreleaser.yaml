@@ -17,6 +17,7 @@ builds:
     ldflags:
       - -s -w
       - -X main.signKey={{ .Env.REQUEST_SIGN_KEY }}
+      - -X main.sentryDsn={{ .Env.SENTRY_DSN }}
 
 release:
   skip_upload: true

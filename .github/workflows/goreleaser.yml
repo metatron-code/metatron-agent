@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SNAPCRAFT_STORE_CREDENTIALS: ${{secrets.SNAPCRAFT_TOKEN}}
+      SENTRY_DSN: ${{secrets.SENTRY_DSN}}
 
     steps:
       - uses: actions/checkout@v3

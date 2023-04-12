@@ -20,7 +20,7 @@ type App struct {
 	metaSignKey string
 }
 
-func New(version, commit, date, signKey string) (*App, error) {
+func New(version, commit, date, signKey, sentryDsn string) (*App, error) {
 	app := &App{
 		cvmAddress:  "cvm-prod.metatron.get-server.net",
 		metaVersion: version,
@@ -46,6 +46,10 @@ func New(version, commit, date, signKey string) (*App, error) {
 	sentryClientOptions := sentry.ClientOptions{
 		SampleRate:    0.5,
 		EnableTracing: false,
+	}
+
+	if len(sentryDsn) > 10 {
+		sentryClientOptions.Dsn = sentryDsn
 	}
 
 	if version, ok := os.LookupEnv("SNAP_VERSION"); ok {
