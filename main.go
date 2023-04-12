@@ -9,6 +9,13 @@ import (
 	"github.com/metatron-code/metatron-agent/app"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+	signKey = "none"
+)
+
 func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(os.Stdout)
@@ -24,7 +31,7 @@ func main() {
 		}
 	}()
 
-	agent, err := app.New()
+	agent, err := app.New(version, commit, date, signKey)
 	if err != nil {
 		log.Println("error app initialization:", err)
 		return
