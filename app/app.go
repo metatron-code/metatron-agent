@@ -17,14 +17,16 @@ type App struct {
 	metaVersion string
 	metaCommit  string
 	metaDate    string
+	metaSignKey string
 }
 
-func New(version, commit, date string) (*App, error) {
+func New(version, commit, date, signKey string) (*App, error) {
 	app := &App{
 		cvmAddress:  "cvm-prod.metatron.get-server.net",
 		metaVersion: version,
 		metaCommit:  commit,
 		metaDate:    date,
+		metaSignKey: signKey,
 	}
 
 	var okRootPath bool

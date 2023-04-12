@@ -1,6 +1,7 @@
 before:
   hooks:
     - go mod tidy -v
+
 builds:
   - id: "agent"
     env:
@@ -15,6 +16,10 @@ builds:
       - '7'
     ldflags:
       - -s -w
+      - -X main.signKey={{ .Env.REQUEST_SIGN_KEY }}
+
+release:
+  skip_upload: true
 
 changelog:
   sort: asc

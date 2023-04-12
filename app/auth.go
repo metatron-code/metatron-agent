@@ -1,6 +1,7 @@
 package app
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -69,14 +70,21 @@ func (app *App) loadAuthConfig() (map[string]string, error) {
 }
 
 func (app *App) requestAuthConfig() (map[string]string, error) {
-	endpoint := fmt.Sprintf("https://%s/registration/%s", app.cvmAddress, app.config.AgentUUID.String())
+	sign, err := app.getAuthRequestSign()
 
-	endpointURL, err := url.Parse(endpoint)
-	if err != nil {
-		return nil, err
+	values := url.Values{}
+	values.Add("version", app.metaVersion)
+	values.Add("commit", app.metaCommit)
+	values.Add("sign", sign)
+
+	endpoint := &url.URL{
+		Scheme:   "https",
+		Host:     app.cvmAddress,
+		Path:     fmt.Sprintf("/registration/%s", app.config.AgentUUID.String()),
+		RawQuery: values.Encode(),
 	}
 
-	resp, err := http.Get(endpointURL.String())
+	resp, err := http.Get(endpoint.String())
 	if err != nil {
 		return nil, err
 	}
@@ -99,4 +107,29 @@ func (app *App) requestAuthConfig() (map[string]string, error) {
 	}
 
 	return nil, nil
+}
+
+func (app *App) getAuthRequestSign() (string, error) {
+	hash := sha256.New()
+
+	if _, err := hash.Write([]byte(app.metaCommit)); err != nil {
+		return "", err
+	}
+
+	path, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+
+	return base64.URLEncoding.EncodeToString(hash.Sum(nil)), nil
 }

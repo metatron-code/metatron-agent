@@ -13,6 +13,7 @@ var (
 	version = "dev"
 	commit  = "none"
 	date    = "unknown"
+	signKey = "none"
 )
 
 func init() {
@@ -30,7 +31,7 @@ func main() {
 		}
 	}()
 
-	agent, err := app.New(version, commit, date)
+	agent, err := app.New(version, commit, date, signKey)
 	if err != nil {
 		log.Println("error app initialization:", err)
 		return
