@@ -9,10 +9,10 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-func (app *App) newMQTTClient(conf map[string]string) mqtt.Client {
+func (app *App) newMQTTClient() mqtt.Client {
 	cert, err := tls.X509KeyPair(
-		[]byte(conf["certificate_device"]),
-		[]byte(conf["certificate_keypair_private_key"]),
+		[]byte(app.mqttAuthConf["certificate_device"]),
+		[]byte(app.mqttAuthConf["certificate_keypair_private_key"]),
 	)
 	if err != nil {
 		log.Println("error parse tls key:", err)
@@ -20,7 +20,7 @@ func (app *App) newMQTTClient(conf map[string]string) mqtt.Client {
 	}
 
 	copts := mqtt.NewClientOptions()
-	copts.SetClientID(conf["thing_name"])
+	copts.SetClientID(app.mqttAuthConf["thing_name"])
 	copts.SetAutoReconnect(true)
 	copts.SetMaxReconnectInterval(30 * time.Second)
 	copts.SetOnConnectHandler(app.mqttOnConnect)
@@ -28,11 +28,14 @@ func (app *App) newMQTTClient(conf map[string]string) mqtt.Client {
 		Certificates: []tls.Certificate{cert},
 	})
 
-	copts.AddBroker(fmt.Sprintf("tcps://%s:8883/mqtt", conf["endpoint"]))
+	copts.AddBroker(fmt.Sprintf("tcps://%s:8883/mqtt", app.mqttAuthConf["endpoint"]))
 
 	return mqtt.NewClient(copts)
 }
 
-func (app *App) mqttOnConnect(_ mqtt.Client) {
-	log.Println("mqtt connected")
+func (app *App) mqttOnConnect(client mqtt.Client) {
+	taskTopic := fmt.Sprintf("metatron-agent/%s/tasks", app.mqttAuthConf["thing_name"])
+	if token := client.Subscribe(taskTopic, 0, app.mqttEventTask); token.Wait() && token.Error() != nil {
+		log.Println("error subscribe:", token.Error())
+	}
 }

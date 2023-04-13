@@ -9,11 +9,13 @@ func (app *App) Execute() error {
 	log.Println("Your HW-UID:", app.config.AgentUUID.String())
 
 	var errCount int
+	var err error
+
 	for {
 		time.Sleep(10 * time.Second)
 
-		authConf, err := app.loadAuthConfig()
-		if err != nil || authConf == nil {
+		app.mqttAuthConf, err = app.loadAuthConfig()
+		if err != nil || app.mqttAuthConf == nil {
 			if err != nil {
 				log.Println("load auth config error:", err)
 			}
@@ -26,12 +28,22 @@ func (app *App) Execute() error {
 			continue
 		}
 
-		errCount = 0
-
-		if app.mqtt == nil {
-			app.mqtt = app.newMQTTClient(authConf)
+		if app.mqttAuthConf != nil {
+			break
 		}
-
 	}
 
+	for {
+		if app.mqtt == nil {
+			app.mqtt = app.newMQTTClient()
+		}
+
+		if !app.mqtt.IsConnected() {
+			if token := app.mqtt.Connect(); token.Wait() && token.Error() != nil {
+				return token.Error()
+			}
+		}
+
+		time.Sleep(10 * time.Second)
+	}
 }
