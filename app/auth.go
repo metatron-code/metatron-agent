@@ -17,6 +17,7 @@ import (
 func (app *App) loadAuthConfig() (map[string]string, error) {
 	confFile := path.Join(app.rootFilePath, "auth.dat")
 
+start:
 	if _, err := os.Stat(confFile); os.IsNotExist(err) {
 		conf, err := app.requestAuthConfig()
 		if err != nil {
@@ -58,7 +59,11 @@ func (app *App) loadAuthConfig() (map[string]string, error) {
 
 	data, err := tools.DecryptBytes(dataEncrypted, app.config.AgentUUID.String())
 	if err != nil {
-		return nil, err
+		if err := os.Remove(confFile); err != nil {
+			return nil, err
+		}
+
+		goto start
 	}
 
 	var conf map[string]string

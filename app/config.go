@@ -19,6 +19,7 @@ func (app *App) loadBaseConfig() error {
 
 	var conf config
 
+start:
 	if _, err := os.Stat(confFile); os.IsNotExist(err) {
 		conf.AgentUUID = uuid.New()
 
@@ -53,7 +54,11 @@ func (app *App) loadBaseConfig() error {
 
 		data, err := tools.DecryptBytes(dataEncrypted, app.defaultEncryptPassword)
 		if err != nil {
-			return err
+			if err := os.Remove(confFile); err != nil {
+				return err
+			}
+
+			goto start
 		}
 
 		if err := json.Unmarshal(data, &conf); err != nil {
