@@ -65,3 +65,17 @@ func (app *App) loadBaseConfig() error {
 
 	return nil
 }
+
+func (app *App) removeOldConfigFiles() error {
+	for _, name := range []string{"hw.uid"} {
+		confFile := path.Join(app.rootFilePath, name)
+
+		if _, err := os.Stat(confFile); err == nil {
+			if err := os.Remove(confFile); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}

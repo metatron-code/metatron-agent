@@ -45,6 +45,10 @@ func New(version, commit, date, signKey, sentryDsn string) (*App, error) {
 		return nil, err
 	}
 
+	if err := app.removeOldConfigFiles(); err != nil {
+		return nil, err
+	}
+
 	sentryClientOptions := sentry.ClientOptions{
 		SampleRate:    0.5,
 		EnableTracing: false,
