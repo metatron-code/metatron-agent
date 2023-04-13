@@ -31,10 +31,9 @@ func (app *App) loadBaseConfig() error {
 			return err
 		}
 
-		var encoded []byte
-		base64.RawURLEncoding.Encode(encoded, dataEncrypted)
+		encoded := base64.RawURLEncoding.EncodeToString(dataEncrypted)
 
-		if err := os.WriteFile(confFile, encoded, 0600); err != nil {
+		if err := os.WriteFile(confFile, []byte(encoded), 0600); err != nil {
 			if err != nil {
 				return err
 			}
@@ -46,9 +45,8 @@ func (app *App) loadBaseConfig() error {
 			return err
 		}
 
-		var dataEncrypted []byte
-
-		if _, err := base64.RawURLEncoding.Decode(dataEncrypted, confData); err != nil {
+		dataEncrypted, err := base64.RawURLEncoding.DecodeString(string(confData))
+		if err != nil {
 			return err
 		}
 
