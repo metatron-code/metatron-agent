@@ -1,4 +1,4 @@
-package app
+package tools
 
 import (
 	"crypto/aes"
@@ -9,14 +9,12 @@ import (
 	"io"
 )
 
-const defaultEncryptPassword = "rdtkehWckMwPufJ"
-
-func encryptBytes(data []byte, pass string) ([]byte, error) {
+func EncryptBytes(data []byte, pass string) ([]byte, error) {
 	passHash := sha256.Sum256([]byte(pass))
 
 	block, err := aes.NewCipher(passHash[:])
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	ciphertext := make([]byte, aes.BlockSize+len(data))
@@ -31,7 +29,7 @@ func encryptBytes(data []byte, pass string) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func decryptBytes(encrypted []byte, pass string) ([]byte, error) {
+func DecryptBytes(encrypted []byte, pass string) ([]byte, error) {
 	passHash := sha256.Sum256([]byte(pass))
 
 	block, err := aes.NewCipher(passHash[:])

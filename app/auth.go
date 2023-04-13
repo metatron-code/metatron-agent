@@ -10,6 +10,8 @@ import (
 	"net/url"
 	"os"
 	"path"
+
+	"github.com/metatron-code/metatron-agent/tools"
 )
 
 func (app *App) loadAuthConfig() (map[string]string, error) {
@@ -27,7 +29,7 @@ func (app *App) loadAuthConfig() (map[string]string, error) {
 				return nil, err
 			}
 
-			dataEncrypted, err := encryptBytes(data, app.config.AgentUUID.String())
+			dataEncrypted, err := tools.EncryptBytes(data, app.config.AgentUUID.String())
 			if err != nil {
 				return nil, err
 			}
@@ -54,7 +56,7 @@ func (app *App) loadAuthConfig() (map[string]string, error) {
 		return nil, err
 	}
 
-	data, err := decryptBytes(dataEncrypted, app.config.AgentUUID.String())
+	data, err := tools.DecryptBytes(dataEncrypted, app.config.AgentUUID.String())
 	if err != nil {
 		return nil, err
 	}

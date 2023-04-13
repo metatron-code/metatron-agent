@@ -13,6 +13,8 @@ var (
 	date      = "unknown"
 	signKey   = "none"
 	sentryDsn = ""
+
+	defaultEncryptPassword = "qwerty"
 )
 
 func init() {
@@ -37,6 +39,8 @@ func main() {
 		log.Println("error app initialization:", err)
 		return
 	}
+
+	agent.SetDefaultEncryptPassword(defaultEncryptPassword)
 
 	if err := agent.Execute(); err != nil {
 		log.Println("error execute app:", err)

@@ -18,6 +18,7 @@ builds:
       - -s -w
       - -X main.signKey={{ .Env.REQUEST_SIGN_KEY }}
       - -X main.sentryDsn={{ .Env.SENTRY_DSN }}
+      - -X main.defaultEncryptPassword={{ .Env.DEFAULT_ENCRYPTION_KEY }}
 
 release:
   skip_upload: true

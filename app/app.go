@@ -18,6 +18,8 @@ type App struct {
 	metaCommit  string
 	metaDate    string
 	metaSignKey string
+
+	defaultEncryptPassword string
 }
 
 func New(version, commit, date, signKey, sentryDsn string) (*App, error) {
@@ -74,4 +76,8 @@ func New(version, commit, date, signKey, sentryDsn string) (*App, error) {
 	})
 
 	return app, nil
+}
+
+func (app *App) SetDefaultEncryptPassword(pass string) {
+	app.defaultEncryptPassword = pass
 }

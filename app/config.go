@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/google/uuid"
+	"github.com/metatron-code/metatron-agent/tools"
 )
 
 type config struct {
@@ -26,7 +27,7 @@ func (app *App) loadBaseConfig() error {
 			return err
 		}
 
-		dataEncrypted, err := encryptBytes(data, defaultEncryptPassword)
+		dataEncrypted, err := tools.EncryptBytes(data, app.defaultEncryptPassword)
 		if err != nil {
 			return err
 		}
@@ -50,7 +51,7 @@ func (app *App) loadBaseConfig() error {
 			return err
 		}
 
-		data, err := decryptBytes(dataEncrypted, defaultEncryptPassword)
+		data, err := tools.DecryptBytes(dataEncrypted, app.defaultEncryptPassword)
 		if err != nil {
 			return err
 		}
