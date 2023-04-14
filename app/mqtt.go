@@ -24,7 +24,10 @@ func (app *App) newMQTTClient() mqtt.Client {
 	copts.SetAutoReconnect(true)
 	copts.SetMaxReconnectInterval(30 * time.Second)
 	copts.SetOnConnectHandler(app.mqttOnConnect)
+
 	copts.SetTLSConfig(&tls.Config{
+		ClientAuth:   tls.NoClientCert,
+		ClientCAs:    nil,
 		Certificates: []tls.Certificate{cert},
 	})
 
