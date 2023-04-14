@@ -13,7 +13,7 @@ type App struct {
 	rootFilePath string
 	cvmAddress   string
 	mqtt         mqtt.Client
-	mqttAuthConf map[string]string
+	mqttAuthConf *AuthConfig
 	mqttErrors   int
 
 	metaVersion string

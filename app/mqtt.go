@@ -12,15 +12,15 @@ import (
 
 func (app *App) newMQTTClient() mqtt.Client {
 	cert, err := tls.X509KeyPair(
-		[]byte(app.mqttAuthConf["certificate_device"]),
-		[]byte(app.mqttAuthConf["certificate_keypair_private_key"]),
+		[]byte(app.mqttAuthConf.CertificateDevice),
+		[]byte(app.mqttAuthConf.CertificateKeypairPrivateKey),
 	)
 	if err != nil {
 		log.Println("error parse tls key:", err)
 	}
 
 	copts := mqtt.NewClientOptions()
-	copts.SetClientID(app.mqttAuthConf["thing_name"])
+	copts.SetClientID(app.mqttAuthConf.ThingName)
 	copts.SetAutoReconnect(true)
 	copts.SetMaxReconnectInterval(30 * time.Second)
 	copts.SetOnConnectHandler(app.mqttOnConnect)
@@ -31,13 +31,13 @@ func (app *App) newMQTTClient() mqtt.Client {
 		Certificates: []tls.Certificate{cert},
 	})
 
-	copts.AddBroker(fmt.Sprintf("tcps://%s:8883/mqtt", app.mqttAuthConf["endpoint"]))
+	copts.AddBroker(fmt.Sprintf("tcps://%s:8883/mqtt", app.mqttAuthConf.Endpoint))
 
 	return mqtt.NewClient(copts)
 }
 
 func (app *App) mqttOnConnect(client mqtt.Client) {
-	taskTopic := fmt.Sprintf("metatron-agent/%s/tasks", app.mqttAuthConf["thing_name"])
+	taskTopic := fmt.Sprintf("metatron-agent/%s/tasks", app.mqttAuthConf.ThingName)
 	if token := client.Subscribe(taskTopic, 0, app.mqttEventTask); token.Wait() && token.Error() != nil {
 		log.Println("error subscribe:", token.Error())
 		app.mqttErrors++
@@ -49,7 +49,7 @@ type state struct {
 }
 
 func (app *App) mqttSendState() {
-	stateTopic := fmt.Sprintf("metatron-agent/%s/state", app.mqttAuthConf["thing_name"])
+	stateTopic := fmt.Sprintf("metatron-agent/%s/state", app.mqttAuthConf.ThingName)
 
 	for {
 		if app.mqtt == nil || (app.mqtt != nil && !app.mqtt.IsConnected()) {

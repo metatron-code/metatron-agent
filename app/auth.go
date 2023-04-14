@@ -14,7 +14,17 @@ import (
 	"github.com/metatron-code/metatron-agent/tools"
 )
 
-func (app *App) loadAuthConfig() (map[string]string, error) {
+type AuthConfig struct {
+	Endpoint  string `json:"endpoint"`
+	ThingName string `json:"thing_name"`
+
+	CertificateID                string `json:"certificate_id"`
+	CertificateDevice            string `json:"certificate_device"`
+	CertificateKeypairPublicKey  string `json:"certificate_keypair_public_key"`
+	CertificateKeypairPrivateKey string `json:"certificate_keypair_private_key"`
+}
+
+func (app *App) loadAuthConfig() (*AuthConfig, error) {
 	confFile := path.Join(app.rootFilePath, "auth.dat")
 
 start:
@@ -66,7 +76,7 @@ start:
 		goto start
 	}
 
-	var conf map[string]string
+	conf := &AuthConfig{}
 	if err := json.Unmarshal(data, &conf); err != nil {
 		return nil, err
 	}
@@ -74,7 +84,7 @@ start:
 	return conf, nil
 }
 
-func (app *App) requestAuthConfig() (map[string]string, error) {
+func (app *App) requestAuthConfig() (*AuthConfig, error) {
 	sign, err := app.getAuthRequestSign()
 	if err != nil {
 		return nil, err
@@ -97,7 +107,7 @@ func (app *App) requestAuthConfig() (map[string]string, error) {
 		return nil, err
 	}
 
-	var conf map[string]string
+	conf := &AuthConfig{}
 
 	if resp.StatusCode == http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
