@@ -69,6 +69,7 @@ func (app *App) mqttSendState() {
 
 		if token := app.mqtt.Publish(stateTopic, 1, false, dataBytes); token.Wait() && token.Error() != nil {
 			log.Println("error publish:", err)
+			app.mqttErrors++
 		}
 
 		time.Sleep(time.Minute)
