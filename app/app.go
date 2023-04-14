@@ -14,6 +14,7 @@ type App struct {
 	cvmAddress   string
 	mqtt         mqtt.Client
 	mqttAuthConf map[string]string
+	mqttErrors   int
 
 	metaVersion string
 	metaCommit  string

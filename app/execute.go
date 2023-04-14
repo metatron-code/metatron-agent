@@ -33,7 +33,15 @@ func (app *App) Execute() error {
 		}
 	}
 
+	go app.mqttSendState()
+
 	for {
+		if app.mqttErrors >= 10 {
+			app.mqtt.Disconnect(250)
+			app.mqtt = nil
+			app.mqttErrors = 0
+		}
+
 		if app.mqtt == nil {
 			app.mqtt = app.newMQTTClient()
 		}
