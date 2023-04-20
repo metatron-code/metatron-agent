@@ -45,7 +45,10 @@ func (app *App) mqttOnConnect(client mqtt.Client) {
 }
 
 type state struct {
-	Connected int64 `json:"connected"`
+	AgentID   string `json:"agent_id"`
+	Connected int64  `json:"connected"`
+	Uptime    int64  `json:"uptime"`
+	Version   string `json:"app_version"`
 }
 
 func (app *App) mqttSendState() {
@@ -58,7 +61,10 @@ func (app *App) mqttSendState() {
 		}
 
 		data := state{
+			AgentID:   app.config.AgentUUID.String(),
 			Connected: time.Now().Unix(),
+			Uptime:    int64(time.Since(app.startTime).Seconds()),
+			Version:   app.metaVersion,
 		}
 
 		dataBytes, err := json.Marshal(data)

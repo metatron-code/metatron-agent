@@ -3,6 +3,7 @@ package app
 import (
 	"os"
 	"runtime"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/getsentry/sentry-go"
@@ -15,6 +16,8 @@ type App struct {
 	mqtt         mqtt.Client
 	mqttAuthConf *AuthConfig
 	mqttErrors   int
+
+	startTime time.Time
 
 	metaVersion string
 	metaCommit  string
@@ -31,6 +34,8 @@ func New(version, commit, date, signKey, sentryDsn string) (*App, error) {
 		metaCommit:  commit,
 		metaDate:    date,
 		metaSignKey: signKey,
+
+		startTime: time.Now(),
 	}
 
 	var okRootPath bool
