@@ -98,7 +98,7 @@ func (app *App) requestAuthConfig() (*AuthConfig, error) {
 	endpoint := &url.URL{
 		Scheme:   "https",
 		Host:     app.cvmAddress,
-		Path:     fmt.Sprintf("/registration/%s", app.config.AgentUUID.String()),
+		Path:     fmt.Sprintf("/Prod/registration/%s", app.config.AgentUUID.String()),
 		RawQuery: values.Encode(),
 	}
 
