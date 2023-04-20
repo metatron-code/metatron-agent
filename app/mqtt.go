@@ -72,6 +72,6 @@ func (app *App) mqttSendState() {
 			app.mqttErrors++
 		}
 
-		time.Sleep(time.Minute)
+		time.Sleep(3 * time.Minute)
 	}
 }
