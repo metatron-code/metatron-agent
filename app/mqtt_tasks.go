@@ -1,12 +1,13 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
-	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/eclipse/paho.golang/paho"
 )
 
 type Task struct {
@@ -21,10 +22,10 @@ type TaskResponse struct {
 	Endtime   int64  `json:"endtime"`   // Unix timestamp for end of task
 }
 
-func (app *App) mqttEventTask(_ mqtt.Client, msg mqtt.Message) {
+func (app *App) mqttEventTask(msg *paho.Publish) {
 	var task Task
 
-	if err := json.Unmarshal(msg.Payload(), &task); err != nil {
+	if err := json.Unmarshal(msg.Payload, &task); err != nil {
 		log.Println("error unmarshal message:", err)
 		return
 	}
@@ -42,7 +43,9 @@ func (app *App) mqttEventTask(_ mqtt.Client, msg mqtt.Message) {
 		}
 
 	default:
-		log.Println("unknown task type:", task.Type)
+		if len(task.Type) > 1 {
+			log.Println("unknown task type:", task.Type)
+		}
 	}
 }
 
@@ -54,9 +57,19 @@ func (app *App) mqttTaskResponse(resp TaskResponse) error {
 		return err
 	}
 
-	responseTopic := fmt.Sprintf("metatron-agent/%s/response", app.mqttAuthConf.ThingName)
+	msg := &paho.Publish{
+		Topic:   fmt.Sprintf("metatron-agent/%s/response", app.mqttAuthConf.ThingName),
+		QoS:     1,
+		Payload: dataBytes,
+		Properties: &paho.PublishProperties{
+			ContentType: "application/json",
+		},
+	}
 
-	if token := app.mqtt.Publish(responseTopic, 1, false, dataBytes); token.Wait() && token.Error() != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
+	defer cancel()
+
+	if _, err := app.mqtt.Publish(ctx, msg); err != nil {
 		log.Println("error publish:", err)
 		app.mqttErrors++
 	}

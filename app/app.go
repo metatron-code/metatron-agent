@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"time"
 
-	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/getsentry/sentry-go"
 )
 
@@ -13,7 +13,7 @@ type App struct {
 	config       config
 	rootFilePath string
 	cvmAddress   string
-	mqtt         mqtt.Client
+	mqtt         *autopaho.ConnectionManager
 	mqttAuthConf *AuthConfig
 	mqttErrors   int
 

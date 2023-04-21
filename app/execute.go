@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"log"
 	"time"
 )
@@ -37,19 +38,21 @@ func (app *App) Execute() error {
 
 	for {
 		if app.mqttErrors >= 10 {
-			app.mqtt.Disconnect(250)
+			app.mqtt.Disconnect(context.Background())
 			app.mqtt = nil
 			app.mqttErrors = 0
 		}
 
 		if app.mqtt == nil {
-			app.mqtt = app.newMQTTClient()
+			app.mqtt, err = app.newMQTTClient()
+			if err != nil {
+				log.Println("error mqtt client:", err)
+				app.mqtt = nil
+			}
 		}
 
-		if !app.mqtt.IsConnected() {
-			if token := app.mqtt.Connect(); token.Wait() && token.Error() != nil {
-				return token.Error()
-			}
+		if err := app.mqtt.AwaitConnection(context.Background()); err != nil {
+			log.Println("error mqtt await connection", err)
 		}
 
 		time.Sleep(10 * time.Second)
