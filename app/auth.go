@@ -1,7 +1,6 @@
 package app
 
 import (
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -11,6 +10,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/metatron-code/metatron-agent/internal/intapi"
 	"github.com/metatron-code/metatron-agent/tools"
 )
 
@@ -96,24 +96,15 @@ start:
 }
 
 func (app *App) requestAuthConfig() (*AuthConfig, error) {
-	sign, err := app.getAuthRequestSign()
-	if err != nil {
-		return nil, err
-	}
-
-	values := url.Values{}
-	values.Add("version", app.metaVersion)
-	values.Add("commit", app.metaCommit)
-	values.Add("sign", sign)
+	client := intapi.NewHttpClient(app.metaVersion, app.metaCommit, app.metaSignKey)
 
 	endpoint := &url.URL{
-		Scheme:   "https",
-		Host:     app.cvmAddress,
-		Path:     fmt.Sprintf("/Prod/registration/%s", app.config.AgentUUID.String()),
-		RawQuery: values.Encode(),
+		Scheme: "https",
+		Host:   app.cvmAddress,
+		Path:   fmt.Sprintf("/Prod/registration/%s", app.config.AgentUUID.String()),
 	}
 
-	resp, err := http.Get(endpoint.String())
+	resp, err := client.Get(endpoint.String())
 	if err != nil {
 		return nil, err
 	}
@@ -138,50 +129,16 @@ func (app *App) requestAuthConfig() (*AuthConfig, error) {
 	return nil, nil
 }
 
-func (app *App) getAuthRequestSign() (string, error) {
-	hash := sha256.New()
-
-	if _, err := hash.Write([]byte(app.metaCommit)); err != nil {
-		return "", err
-	}
-
-	path, err := os.Executable()
-	if err != nil {
-		return "", err
-	}
-
-	file, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
-	}
-
-	return base64.URLEncoding.EncodeToString(hash.Sum(nil)), nil
-}
-
 func (app *App) verifyAuthConfig(conf *AuthConfig) (bool, error) {
-	sign, err := app.getAuthRequestSign()
-	if err != nil {
-		return false, err
-	}
-
-	values := url.Values{}
-	values.Add("version", app.metaVersion)
-	values.Add("commit", app.metaCommit)
-	values.Add("sign", sign)
+	client := intapi.NewHttpClient(app.metaVersion, app.metaCommit, app.metaSignKey)
 
 	endpoint := &url.URL{
-		Scheme:   "https",
-		Host:     app.cvmAddress,
-		Path:     fmt.Sprintf("/Prod/info/%s", app.config.AgentUUID.String()),
-		RawQuery: values.Encode(),
+		Scheme: "https",
+		Host:   app.cvmAddress,
+		Path:   fmt.Sprintf("/Prod/info/%s", app.config.AgentUUID.String()),
 	}
 
-	resp, err := http.Get(endpoint.String())
+	resp, err := client.Get(endpoint.String())
 	if err != nil {
 		return false, err
 	}
