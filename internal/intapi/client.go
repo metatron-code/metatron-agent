@@ -38,5 +38,7 @@ func (c *HTTPClient) Get(url string) (*http.Response, error) {
 func (c *HTTPClient) Do(req *http.Request, sign string) (*http.Response, error) {
 	req.Header.Set("Authorization", fmt.Sprintf("HMAC-SHA256 %s", sign))
 
+	req.Header.Set("User-Agent", fmt.Sprintf("Mozilla/5.0 (compatible; MetaTronAgent/%s; +https://metatron.vitalvas.dev)", c.appVersion))
+
 	return c.c.Do(req)
 }
