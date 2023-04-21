@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func (c *HttpClient) getAuthRequestSign(method, path string, body []byte) (string, error) {
+func (c *HTTPClient) getAuthRequestSign(method, path string, body []byte) (string, error) {
 	timestamp := fmt.Sprintf("%d", time.Now().Unix())
 
 	nonce := sha1.Sum([]byte(fmt.Sprintf("%s/%s/%s", timestamp, c.appVersion, c.appCommit)))

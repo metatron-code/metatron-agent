@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-type HttpClient struct {
+type HTTPClient struct {
 	c http.Client
 
 	appVersion string
@@ -13,15 +13,15 @@ type HttpClient struct {
 	signKey    string
 }
 
-func NewHttpClient(version, commit, signKey string) *HttpClient {
-	return &HttpClient{
+func NewHTTPClient(version, commit, signKey string) *HTTPClient {
+	return &HTTPClient{
 		appVersion: version,
 		appCommit:  commit,
 		signKey:    signKey,
 	}
 }
 
-func (c *HttpClient) Get(url string) (*http.Response, error) {
+func (c *HTTPClient) Get(url string) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (c *HttpClient) Get(url string) (*http.Response, error) {
 	return c.Do(req, sign)
 }
 
-func (c *HttpClient) Do(req *http.Request, sign string) (*http.Response, error) {
+func (c *HTTPClient) Do(req *http.Request, sign string) (*http.Response, error) {
 	req.Header.Set("Authorization", fmt.Sprintf("HMAC-SHA256 %s", sign))
 
 	return c.c.Do(req)
