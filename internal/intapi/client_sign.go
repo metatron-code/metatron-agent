@@ -3,7 +3,6 @@ package intapi
 import (
 	"bytes"
 	"crypto/hmac"
-	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -15,7 +14,7 @@ import (
 func (c *HTTPClient) getAuthRequestSign(method, path string, body []byte) (string, error) {
 	timestamp := fmt.Sprintf("%d", time.Now().Unix())
 
-	nonce := sha1.Sum([]byte(fmt.Sprintf("%s/%s/%s", timestamp, c.appVersion, c.appCommit)))
+	nonce := sha256.Sum256([]byte(fmt.Sprintf("%s/%s/%s", timestamp, c.appVersion, c.appCommit)))
 
 	var b bytes.Buffer
 	b.Write(nonce[:])
@@ -25,7 +24,7 @@ func (c *HTTPClient) getAuthRequestSign(method, path string, body []byte) (strin
 	b.WriteString(path)
 
 	if method != http.MethodGet && method != http.MethodHead {
-		bodyHash := sha1.Sum(body)
+		bodyHash := sha256.Sum256(body)
 		b.Write(bodyHash[:])
 	}
 
