@@ -8,18 +8,22 @@ import (
 	"time"
 
 	"github.com/eclipse/paho.golang/paho"
+	"github.com/metatron-code/metatron-agent/internal/tasks"
 )
 
 type Task struct {
-	ID   string `json:"id"`
-	Type string `json:"type"`
+	ID     string          `json:"id"`
+	Type   string          `json:"type"`
+	Params json.RawMessage `json:"params"`
 }
 
 type TaskResponse struct {
-	ID        string `json:"id"`
-	Type      string `json:"type"`
-	Timestamp int64  `json:"timestamp"` // Unix timestamp for start of task
-	Endtime   int64  `json:"endtime"`   // Unix timestamp for end of task
+	ID        string          `json:"id"`
+	Type      string          `json:"type"`
+	Timestamp int64           `json:"timestamp"` // Unix timestamp for start of task
+	Endtime   int64           `json:"endtime"`   // Unix timestamp for end of task
+	Params    json.RawMessage `json:"params,omitempty"`
+	Response  json.RawMessage `json:"response,omitempty"`
 }
 
 func (app *App) mqttEventTask(msg *paho.Publish) {
@@ -36,7 +40,29 @@ func (app *App) mqttEventTask(msg *paho.Publish) {
 		Timestamp: time.Now().Unix(),
 	}
 
+	if task.Params != nil {
+		resp.Params = task.Params
+	}
+
 	switch task.Type {
+	case "icmp-ping":
+		task, err := tasks.NewIcmpPing(task.Params)
+		if err != nil {
+			log.Println("error init icmp-ping task:", err)
+			return
+		}
+
+		taskResp, err := task.Run()
+		if err != nil {
+			log.Println("error run icmp-ping task:", err)
+			return
+		}
+		resp.Response = taskResp
+
+		if err := app.mqttTaskResponse(resp); err != nil {
+			log.Println("error make response:", err)
+		}
+
 	case "int-ping":
 		if err := app.mqttTaskResponse(resp); err != nil {
 			log.Println("error make response:", err)
