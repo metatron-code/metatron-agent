@@ -60,6 +60,6 @@ func (app *App) mqttSendShadow() {
 			}
 		}()
 
-		time.Sleep(time.Hour)
+		time.Sleep(12 * time.Hour)
 	}
 }
