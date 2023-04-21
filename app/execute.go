@@ -35,6 +35,7 @@ func (app *App) Execute() error {
 	}
 
 	go app.mqttSendState()
+	go app.mqttSendShadow()
 
 	for {
 		if app.mqttErrors >= 10 {
