@@ -81,6 +81,17 @@ start:
 		return nil, err
 	}
 
+	if verified, err := app.verifyAuthConfig(conf); err != nil {
+		return nil, fmt.Errorf("error verify config: %s", err.Error())
+
+	} else if !verified {
+		if err := os.Remove(confFile); err != nil {
+			return nil, err
+		}
+
+		goto start
+	}
+
 	return conf, nil
 }
 
@@ -150,4 +161,56 @@ func (app *App) getAuthRequestSign() (string, error) {
 	}
 
 	return base64.URLEncoding.EncodeToString(hash.Sum(nil)), nil
+}
+
+func (app *App) verifyAuthConfig(conf *AuthConfig) (bool, error) {
+	sign, err := app.getAuthRequestSign()
+	if err != nil {
+		return false, err
+	}
+
+	values := url.Values{}
+	values.Add("version", app.metaVersion)
+	values.Add("commit", app.metaCommit)
+	values.Add("sign", sign)
+
+	endpoint := &url.URL{
+		Scheme:   "https",
+		Host:     app.cvmAddress,
+		Path:     fmt.Sprintf("/Prod/info/%s", app.config.AgentUUID.String()),
+		RawQuery: values.Encode(),
+	}
+
+	resp, err := http.Get(endpoint.String())
+	if err != nil {
+		return false, err
+	}
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		var data map[string]string
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return false, err
+		}
+
+		if err := json.Unmarshal(body, &data); err != nil {
+			return false, err
+		}
+
+		if certID, ok := data["certificate_id"]; ok {
+			if conf.CertificateID == certID {
+				return true, nil
+			}
+		}
+
+	case http.StatusForbidden:
+		return false, fmt.Errorf("agent was blocked")
+
+	case http.StatusNotFound:
+		return false, nil
+	}
+
+	return false, nil
 }
