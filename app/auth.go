@@ -11,7 +11,7 @@ import (
 	"path"
 
 	"github.com/metatron-code/metatron-agent/internal/intapi"
-	"github.com/metatron-code/metatron-agent/tools"
+	"github.com/metatron-code/metatron-agent/internal/tools"
 )
 
 type AuthConfig struct {

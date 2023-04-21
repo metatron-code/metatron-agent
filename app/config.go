@@ -7,7 +7,7 @@ import (
 	"path"
 
 	"github.com/google/uuid"
-	"github.com/metatron-code/metatron-agent/tools"
+	"github.com/metatron-code/metatron-agent/internal/tools"
 )
 
 type config struct {
