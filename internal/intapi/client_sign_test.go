@@ -9,8 +9,7 @@ import (
 )
 
 func TestGetAuthRequestSign(t *testing.T) {
-	signKey := "PTCSfWLuuCoF8AHLCTzgY8EOd8Xy79yU"
-	client := NewHTTPClient("0.1.2", "87f173b54157ab59626dd7692f4f317612a98a7f", signKey)
+	client := NewHTTPClient("0.1.2", "87f173b54157ab59626dd7692f4f317612a98a7f")
 
 	sign, err := client.GetAuthRequestSign(http.MethodGet, "/", nil)
 	if err != nil {

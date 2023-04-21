@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/metatron-code/metatron-agent/internal/vars"
 )
 
 func (c *HTTPClient) GetAuthRequestSign(method, path string, body []byte) (string, error) {
@@ -29,7 +31,12 @@ func (c *HTTPClient) GetAuthRequestSign(method, path string, body []byte) (strin
 		b.Write(bodyHash[:])
 	}
 
-	hash := hmac.New(sha256.New, []byte(c.signKey))
+	signKey, err := base64.RawURLEncoding.DecodeString(vars.SignKey)
+	if err != nil {
+		return "", err
+	}
+
+	hash := hmac.New(sha256.New, signKey)
 
 	if _, err := hash.Write(b.Bytes()); err != nil {
 		return "", err

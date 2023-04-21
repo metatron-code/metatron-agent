@@ -10,14 +10,12 @@ type HTTPClient struct {
 
 	appVersion string
 	appCommit  string
-	signKey    string
 }
 
-func NewHTTPClient(version, commit, signKey string) *HTTPClient {
+func NewHTTPClient(version, commit string) *HTTPClient {
 	return &HTTPClient{
 		appVersion: version,
 		appCommit:  commit,
-		signKey:    signKey,
 	}
 }
 

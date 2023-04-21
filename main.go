@@ -11,11 +11,12 @@ var (
 	version   = "dev"
 	commit    = "none"
 	date      = "unknown"
-	signKey   = "none"
 	sentryDsn = ""
 
 	defaultEncryptPassword = "qwerty"
 )
+
+//go:generate go run ./internal/gen.go
 
 func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
@@ -34,7 +35,7 @@ func main() {
 	// 	}
 	// }()
 
-	agent, err := app.New(version, commit, date, signKey, sentryDsn)
+	agent, err := app.New(version, commit, date, sentryDsn)
 	if err != nil {
 		log.Println("error app initialization:", err)
 		return

@@ -1,5 +1,6 @@
 before:
   hooks:
+    - go generate -x
     - go mod tidy -v
 
 builds:
@@ -19,7 +20,6 @@ builds:
       - -X main.version={{.Version}}
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
-      - -X main.signKey={{ .Env.REQUEST_SIGN_KEY }}
       - -X main.sentryDsn={{ .Env.SENTRY_DSN }}
       - -X main.defaultEncryptPassword={{ .Env.DEFAULT_ENCRYPTION_KEY }}
 

@@ -21,6 +21,9 @@ jobs:
 
       - uses: actions/checkout@v3
       
+      - name: Generate
+        run: go generate -x
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:

@@ -22,18 +22,16 @@ type App struct {
 	metaVersion string
 	metaCommit  string
 	metaDate    string
-	metaSignKey string
 
 	defaultEncryptPassword string
 }
 
-func New(version, commit, date, signKey, sentryDsn string) (*App, error) {
+func New(version, commit, date, sentryDsn string) (*App, error) {
 	app := &App{
 		cvmAddress:  "oyw2ltnb9c.execute-api.eu-west-1.amazonaws.com",
 		metaVersion: version,
 		metaCommit:  commit,
 		metaDate:    date,
-		metaSignKey: signKey,
 
 		startTime: time.Now(),
 	}
