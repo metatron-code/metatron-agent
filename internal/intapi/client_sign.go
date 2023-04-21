@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func (c *HTTPClient) getAuthRequestSign(method, path string, body []byte) (string, error) {
+func (c *HTTPClient) GetAuthRequestSign(method, path string, body []byte) (string, error) {
 	timestamp := fmt.Sprintf("%d", time.Now().Unix())
 
 	nonce := sha256.Sum256([]byte(fmt.Sprintf("%s/%s/%s", timestamp, c.appVersion, c.appCommit)))
@@ -25,6 +25,7 @@ func (c *HTTPClient) getAuthRequestSign(method, path string, body []byte) (strin
 
 	if method != http.MethodGet && method != http.MethodHead {
 		bodyHash := sha256.Sum256(body)
+		b.WriteString("\n")
 		b.Write(bodyHash[:])
 	}
 
@@ -38,10 +39,10 @@ func (c *HTTPClient) getAuthRequestSign(method, path string, body []byte) (strin
 		"app":       "metatron-agent",
 		"version":   c.appVersion,
 		"timestamp": timestamp,
-		"signature": base64.URLEncoding.EncodeToString(hash.Sum(nil)),
+		"signature": base64.RawURLEncoding.EncodeToString(hash.Sum(nil)),
 	}
 
-	dataSlice := make([]string, len(data))
+	dataSlice := make([]string, 0)
 
 	for key, val := range data {
 		dataSlice = append(dataSlice, fmt.Sprintf("%s=%s", key, val))

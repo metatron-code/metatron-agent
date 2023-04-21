@@ -27,7 +27,7 @@ func (c *HTTPClient) Get(url string) (*http.Response, error) {
 		return nil, err
 	}
 
-	sign, err := c.getAuthRequestSign(req.Method, req.URL.Path, nil)
+	sign, err := c.GetAuthRequestSign(req.Method, req.URL.Path, nil)
 	if err != nil {
 		return nil, err
 	}

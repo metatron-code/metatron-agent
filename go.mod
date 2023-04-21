@@ -6,6 +6,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/getsentry/sentry-go v0.20.0
 	github.com/google/uuid v1.3.0
+	golang.org/x/exp v0.0.0-20230420155640-133eef4313cb
 )
 
 require (
