@@ -1,5 +1,7 @@
 package tasks
 
+import "time"
+
 type Task interface {
-	Run() ([]byte, error)
+	Run(timeout time.Duration) ([]byte, error)
 }

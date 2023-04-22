@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"encoding/json"
+	"time"
 
 	probing "github.com/prometheus-community/pro-bing"
 )
@@ -48,7 +49,9 @@ func NewIcmpPing(params []byte) (*IcmpPing, error) {
 	return task, nil
 }
 
-func (t *IcmpPing) Run() ([]byte, error) {
+func (t *IcmpPing) Run(timeout time.Duration) ([]byte, error) {
+	t.ping.Timeout = timeout
+
 	if err := t.ping.Run(); err != nil {
 		return nil, err
 	}

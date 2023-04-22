@@ -50,6 +50,8 @@ func (app *App) mqttEventTask(msg *paho.Publish) {
 
 	log.Printf("received task - type: %s, id: %s", task.Type, task.ID)
 
+	timeout := time.Minute
+
 	switch task.Type {
 	case "icmp-ping":
 		task, err := tasks.NewIcmpPing(task.Params)
@@ -58,12 +60,11 @@ func (app *App) mqttEventTask(msg *paho.Publish) {
 			return
 		}
 
-		taskResp, err := task.Run()
+		resp.Response, err = task.Run(timeout)
 		if err != nil {
 			log.Println("error run icmp-ping task:", err)
 			return
 		}
-		resp.Response = taskResp
 
 		if err := app.mqttTaskResponse(resp); err != nil {
 			log.Println("error make response:", err)
