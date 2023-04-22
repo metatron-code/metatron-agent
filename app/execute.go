@@ -13,7 +13,7 @@ func (app *App) Execute() error {
 	var err error
 
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Second)
 
 		app.mqttAuthConf, err = app.loadAuthConfig()
 		if err != nil || app.mqttAuthConf == nil {

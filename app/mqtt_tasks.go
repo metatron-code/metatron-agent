@@ -79,6 +79,8 @@ func (app *App) mqttEventTask(msg *paho.Publish) {
 			log.Println("unknown task type:", task.Type)
 		}
 	}
+
+	log.Printf("finish task - type: %s, id: %s, duration: %ds", task.Type, task.ID, time.Now().Unix()-resp.Timestamp)
 }
 
 func (app *App) mqttTaskResponse(resp TaskResponse) error {
