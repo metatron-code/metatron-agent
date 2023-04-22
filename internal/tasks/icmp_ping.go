@@ -8,8 +8,9 @@ import (
 )
 
 type IcmpPing struct {
-	Target string `json:"target"`
-	Count  int    `json:"count"`
+	Target  string `json:"target"`
+	Count   int    `json:"count"`
+	Network string `json:"network"`
 
 	ping *probing.Pinger
 }
@@ -35,15 +36,20 @@ func NewIcmpPing(params []byte) (*IcmpPing, error) {
 		return nil, err
 	}
 
-	var err error
-	task.ping, err = probing.NewPinger(task.Target)
-	if err != nil {
-		return nil, err
-	}
+	task.ping = probing.New(task.Target)
 
 	task.ping.Count = 4
 	if task.Count > 0 {
 		task.ping.Count = task.Count
+	}
+
+	// TODO: add custom resolver due golang bug: https://github.com/golang/go/issues/28666
+	switch task.Network {
+	case "ipv4":
+		task.ping.SetNetwork("ip4")
+
+	case "ipv6":
+		task.ping.SetNetwork("ip6")
 	}
 
 	return task, nil
