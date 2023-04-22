@@ -29,6 +29,10 @@ type TaskResponse struct {
 func (app *App) mqttEventTask(msg *paho.Publish) {
 	var task Task
 
+	if msg.Payload == nil {
+		return
+	}
+
 	if err := json.Unmarshal(msg.Payload, &task); err != nil {
 		log.Println("error unmarshal message:", err)
 		return
