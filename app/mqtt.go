@@ -46,7 +46,8 @@ func (app *App) newMQTTClient() (*autopaho.ConnectionManager, error) {
 
 func (app *App) mqttOnConnect(cm *autopaho.ConnectionManager, _ *paho.Connack) {
 	subscriptions := map[string]paho.SubscribeOptions{
-		fmt.Sprintf("metatron-agent/%s/tasks", app.mqttAuthConf.ThingName): {QoS: 1},
+		fmt.Sprintf("metatron-agent/%s/tasks", app.mqttAuthConf.ThingName):            {QoS: 1},
+		fmt.Sprintf("$aws/things/%s/shadow/get/accepted", app.mqttAuthConf.ThingName): {QoS: 1},
 	}
 
 	if _, err := cm.Subscribe(context.Background(), &paho.Subscribe{Subscriptions: subscriptions}); err != nil {

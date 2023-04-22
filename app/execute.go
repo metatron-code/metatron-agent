@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -35,13 +36,16 @@ func (app *App) Execute() error {
 	}
 
 	go app.mqttSendState()
-	go app.mqttSendShadow()
+
+	var once sync.Once
 
 	for {
 		if app.mqttErrors >= 10 {
 			app.mqtt.Disconnect(context.Background())
 			app.mqtt = nil
 			app.mqttErrors = 0
+
+			once = sync.Once{}
 		}
 
 		if app.mqtt == nil {
@@ -50,6 +54,7 @@ func (app *App) Execute() error {
 				log.Println("error mqtt client:", err)
 				app.mqtt = nil
 			}
+
 		}
 
 		if err := app.mqtt.AwaitConnection(context.Background()); err != nil {
@@ -57,5 +62,9 @@ func (app *App) Execute() error {
 		}
 
 		time.Sleep(10 * time.Second)
+
+		once.Do(func() {
+			app.mqttSendShadow()
+		})
 	}
 }
