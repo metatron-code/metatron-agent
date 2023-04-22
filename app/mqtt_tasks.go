@@ -44,6 +44,8 @@ func (app *App) mqttEventTask(msg *paho.Publish) {
 		resp.Params = task.Params
 	}
 
+	log.Printf("received task - type: %s, id: %s", task.Type, task.ID)
+
 	switch task.Type {
 	case "icmp-ping":
 		task, err := tasks.NewIcmpPing(task.Params)
