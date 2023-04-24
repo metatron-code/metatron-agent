@@ -1,15 +1,19 @@
 package intapi
 
 import (
+	"log"
 	"net/http"
 	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"golang.org/x/exp/slices"
 )
 
 func TestGetAuthRequestSign(t *testing.T) {
-	client := NewHTTPClient("0.1.2", "87f173b54157ab59626dd7692f4f317612a98a7f")
+	agentID := uuid.New()
+
+	client := NewHTTPClient("0.1.2", "87f173b54157ab59626dd7692f4f317612a98a7f", agentID)
 
 	sign, err := client.GetAuthRequestSign(http.MethodGet, "/", nil)
 	if err != nil {
@@ -43,4 +47,6 @@ func TestGetAuthRequestSign(t *testing.T) {
 			t.Errorf("required key not found: %s", row)
 		}
 	}
+
+	log.Printf("Auth sign: %s", sign)
 }

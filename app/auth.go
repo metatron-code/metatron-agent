@@ -96,7 +96,7 @@ start:
 }
 
 func (app *App) requestAuthConfig() (*AuthConfig, error) {
-	client := intapi.NewHTTPClient(app.metaVersion, app.metaCommit)
+	client := intapi.NewHTTPClient(app.metaVersion, app.metaCommit, app.config.AgentUUID)
 
 	endpoint := &url.URL{
 		Scheme: "https",
@@ -130,7 +130,7 @@ func (app *App) requestAuthConfig() (*AuthConfig, error) {
 }
 
 func (app *App) verifyAuthConfig(conf *AuthConfig) (bool, error) {
-	client := intapi.NewHTTPClient(app.metaVersion, app.metaCommit)
+	client := intapi.NewHTTPClient(app.metaVersion, app.metaCommit, app.config.AgentUUID)
 
 	endpoint := &url.URL{
 		Scheme: "https",
