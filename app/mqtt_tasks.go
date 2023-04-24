@@ -19,6 +19,7 @@ type Task struct {
 
 type TaskResponse struct {
 	ID        string          `json:"id"`
+	AgentID   string          `json:"agent_id"`
 	Type      string          `json:"type"`
 	Timestamp int64           `json:"timestamp"` // Unix timestamp for start of task
 	Endtime   int64           `json:"endtime"`   // Unix timestamp for end of task
@@ -40,6 +41,7 @@ func (app *App) mqttEventTask(msg *paho.Publish) {
 
 	resp := TaskResponse{
 		ID:        task.ID,
+		AgentID:   app.config.AgentUUID.String(),
 		Type:      task.Type,
 		Timestamp: time.Now().Unix(),
 	}
