@@ -15,14 +15,14 @@ func TestGetAuthRequestSign(t *testing.T) {
 
 	client := NewHTTPClient("0.1.2", "87f173b54157ab59626dd7692f4f317612a98a7f", agentID)
 
-	sign, err := client.GetAuthRequestSign(http.MethodGet, "/", nil)
+	sign, err := client.GetAuthRequestSign(http.MethodGet, "/")
 	if err != nil {
 		t.Error(err)
 	}
 
 	keys := strings.Split(sign, ";")
-	if len(keys) != 4 {
-		t.Errorf("error count of sign keys - got: %d, wants: 4", len(keys))
+	if len(keys) != 5 {
+		t.Errorf("error count of sign keys - got: %d, wants: 5", len(keys))
 	}
 
 	currentKeys := make([]string, len(keys))
@@ -40,7 +40,7 @@ func TestGetAuthRequestSign(t *testing.T) {
 		currentKeys[idx] = keyValue[0]
 	}
 
-	requiredKeys := []string{"app", "timestamp", "version", "signature"}
+	requiredKeys := []string{"app", "agent_id", "timestamp", "version", "signature"}
 
 	for _, row := range requiredKeys {
 		if !slices.Contains(currentKeys, row) {

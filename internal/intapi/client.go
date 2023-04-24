@@ -30,7 +30,7 @@ func (c *HTTPClient) Get(url string) (*http.Response, error) {
 		return nil, err
 	}
 
-	sign, err := c.GetAuthRequestSign(req.Method, req.URL.Path, nil)
+	sign, err := c.GetAuthRequestSign(req.Method, req.URL.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,6 @@ func (c *HTTPClient) Get(url string) (*http.Response, error) {
 
 func (c *HTTPClient) Do(req *http.Request, sign string) (*http.Response, error) {
 	req.Header.Set("Authorization", fmt.Sprintf("HMAC-SHA256 %s", sign))
-	req.Header.Set("Authorization-Agent-ID", c.agentID.String())
 
 	req.Header.Set("User-Agent", fmt.Sprintf("Mozilla/5.0 (compatible; MetaTronAgent/%s; +https://metatron.vitalvas.dev)", c.appVersion))
 
