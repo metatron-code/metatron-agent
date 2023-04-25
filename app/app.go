@@ -2,11 +2,9 @@ package app
 
 import (
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/eclipse/paho.golang/autopaho"
-	"github.com/getsentry/sentry-go"
 )
 
 type App struct {
@@ -26,7 +24,7 @@ type App struct {
 	defaultEncryptPassword string
 }
 
-func New(version, commit, date, sentryDsn string) (*App, error) {
+func New(version, commit, date string) (*App, error) {
 	app := &App{
 		cvmAddress:  "4w8lflsa93.execute-api.eu-west-1.amazonaws.com",
 		metaVersion: version,
@@ -53,36 +51,6 @@ func New(version, commit, date, sentryDsn string) (*App, error) {
 	if err := app.removeOldConfigFiles(); err != nil {
 		return nil, err
 	}
-
-	sentryClientOptions := sentry.ClientOptions{
-		SampleRate:    0.5,
-		EnableTracing: false,
-	}
-
-	if len(sentryDsn) > 10 {
-		sentryClientOptions.Dsn = sentryDsn
-	}
-
-	if version, ok := os.LookupEnv("SNAP_VERSION"); ok {
-		sentryClientOptions.Release = version
-	}
-
-	if err := sentry.Init(sentryClientOptions); err != nil {
-		return nil, err
-	}
-
-	sentry.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetTags(map[string]string{
-			"OS":      runtime.GOOS,
-			"ARCH":    runtime.GOARCH,
-			"Version": version,
-			"Commit":  commit,
-		})
-
-		scope.SetUser(sentry.User{
-			ID: app.config.AgentUUID.String(),
-		})
-	})
 
 	return app, nil
 }

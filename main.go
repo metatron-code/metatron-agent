@@ -8,10 +8,9 @@ import (
 )
 
 var (
-	version   = "dev"
-	commit    = "none"
-	date      = "unknown"
-	sentryDsn = ""
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 
 	defaultEncryptPassword = "qwerty"
 )
@@ -24,18 +23,7 @@ func init() {
 }
 
 func main() {
-	// defer func() {
-	// 	err := recover()
-
-	// 	if err != nil {
-	// 		log.Println("global error:", err)
-
-	// 		sentry.CurrentHub().Recover(err)
-	// 		sentry.Flush(2 * time.Second)
-	// 	}
-	// }()
-
-	agent, err := app.New(version, commit, date, sentryDsn)
+	agent, err := app.New(version, commit, date)
 	if err != nil {
 		log.Println("error app initialization:", err)
 		return
