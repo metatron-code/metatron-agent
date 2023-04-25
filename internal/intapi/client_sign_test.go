@@ -1,7 +1,6 @@
 package intapi
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"testing"
@@ -11,11 +10,18 @@ import (
 )
 
 func TestGetAuthRequestSign(t *testing.T) {
-	agentID := uuid.New()
+	agentID, err := uuid.Parse("34538c96-808c-465d-be8b-bba49339392f")
+	if err != nil {
+		t.Error(err)
+	}
+
+	var timestamp int64 = 1682466181
 
 	client := NewHTTPClient("0.1.2", "87f173b54157ab59626dd7692f4f317612a98a7f", agentID)
 
-	sign, err := client.GetAuthRequestSign(http.MethodGet, "/")
+	client.SetSignKey("-7sSHnpPQl3gq27jyu8qdl_gtZphGFgc")
+
+	sign, err := client.GetAuthRequestSign(http.MethodGet, "/", timestamp)
 	if err != nil {
 		t.Error(err)
 	}
@@ -48,5 +54,7 @@ func TestGetAuthRequestSign(t *testing.T) {
 		}
 	}
 
-	log.Printf("Auth sign: %s", sign)
+	if sign != "agent_id=34538c96-808c-465d-be8b-bba49339392f;app=metatron-agent;signature=TqvihO0Cd4sTlG0K6bI_SLFUjMpzEElFhylskSczABo;timestamp=1682466181;version=0.1.2" {
+		t.Errorf("error validate sign: %s", sign)
+	}
 }

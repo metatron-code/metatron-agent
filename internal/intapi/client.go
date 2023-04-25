@@ -3,8 +3,10 @@ package intapi
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/metatron-code/metatron-agent/internal/vars"
 )
 
 type HTTPClient struct {
@@ -14,6 +16,8 @@ type HTTPClient struct {
 
 	appVersion string
 	appCommit  string
+
+	signKey string
 }
 
 func NewHTTPClient(version, commit string, agentID uuid.UUID) *HTTPClient {
@@ -21,7 +25,13 @@ func NewHTTPClient(version, commit string, agentID uuid.UUID) *HTTPClient {
 		agentID:    agentID,
 		appVersion: version,
 		appCommit:  commit,
+
+		signKey: vars.SignKey,
 	}
+}
+
+func (c *HTTPClient) SetSignKey(key string) {
+	c.signKey = key
 }
 
 func (c *HTTPClient) Get(url string) (*http.Response, error) {
@@ -30,7 +40,7 @@ func (c *HTTPClient) Get(url string) (*http.Response, error) {
 		return nil, err
 	}
 
-	sign, err := c.GetAuthRequestSign(req.Method, req.URL.Path)
+	sign, err := c.GetAuthRequestSign(req.Method, req.URL.Path, time.Now().Unix())
 	if err != nil {
 		return nil, err
 	}

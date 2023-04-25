@@ -6,16 +6,15 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"sort"
 	"strings"
-	"time"
-
-	"github.com/metatron-code/metatron-agent/internal/vars"
 )
 
-func (c *HTTPClient) GetAuthRequestSign(method, path string) (string, error) {
-	timestamp := fmt.Sprintf("%d", time.Now().Unix())
+func (c *HTTPClient) GetAuthRequestSign(method, path string, timestamp int64) (string, error) {
+	timestampStr := fmt.Sprintf("%d", timestamp)
 	agentID := c.agentID.String()
-	nonce := sha256.Sum256([]byte(fmt.Sprintf("%s/%s/%s", timestamp, c.appVersion, c.appCommit)))
+
+	nonce := sha256.Sum256([]byte(fmt.Sprintf("%s/%s/%s", timestampStr, c.appVersion, c.appCommit)))
 
 	var b bytes.Buffer
 	b.Write(nonce[:])
@@ -29,7 +28,7 @@ func (c *HTTPClient) GetAuthRequestSign(method, path string) (string, error) {
 	b.WriteString("\n")
 	b.WriteString(agentID)
 
-	signKey, err := base64.RawURLEncoding.DecodeString(vars.SignKey)
+	signKey, err := base64.RawURLEncoding.DecodeString(c.signKey)
 	if err != nil {
 		return "", err
 	}
@@ -44,7 +43,7 @@ func (c *HTTPClient) GetAuthRequestSign(method, path string) (string, error) {
 		"app":       "metatron-agent",
 		"agent_id":  agentID,
 		"version":   c.appVersion,
-		"timestamp": timestamp,
+		"timestamp": timestampStr,
 		"signature": base64.RawURLEncoding.EncodeToString(hash.Sum(nil)),
 	}
 
@@ -53,6 +52,8 @@ func (c *HTTPClient) GetAuthRequestSign(method, path string) (string, error) {
 	for key, val := range data {
 		dataSlice = append(dataSlice, fmt.Sprintf("%s=%s", key, val))
 	}
+
+	sort.Strings(dataSlice)
 
 	return strings.Join(dataSlice, ";"), nil
 }
