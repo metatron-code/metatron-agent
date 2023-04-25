@@ -101,7 +101,7 @@ func (app *App) requestAuthConfig() (*AuthConfig, error) {
 	endpoint := &url.URL{
 		Scheme: "https",
 		Host:   app.cvmAddress,
-		Path:   fmt.Sprintf("/Prod/registration/%s", app.config.AgentUUID.String()),
+		Path:   fmt.Sprintf("/registration/%s", app.config.AgentUUID.String()),
 	}
 
 	resp, err := client.Get(endpoint.String())
@@ -135,7 +135,7 @@ func (app *App) verifyAuthConfig(conf *AuthConfig) (bool, error) {
 	endpoint := &url.URL{
 		Scheme: "https",
 		Host:   app.cvmAddress,
-		Path:   fmt.Sprintf("/Prod/info/%s", app.config.AgentUUID.String()),
+		Path:   fmt.Sprintf("/info/%s", app.config.AgentUUID.String()),
 	}
 
 	resp, err := client.Get(endpoint.String())

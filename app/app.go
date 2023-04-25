@@ -28,7 +28,7 @@ type App struct {
 
 func New(version, commit, date, sentryDsn string) (*App, error) {
 	app := &App{
-		cvmAddress:  "oyw2ltnb9c.execute-api.eu-west-1.amazonaws.com",
+		cvmAddress:  "4w8lflsa93.execute-api.eu-west-1.amazonaws.com",
 		metaVersion: version,
 		metaCommit:  commit,
 		metaDate:    date,
