@@ -20,7 +20,6 @@ builds:
       - -X main.version={{.Version}}
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
-      - -X main.sentryDsn={{ .Env.SENTRY_DSN }}
       - -X main.defaultEncryptPassword={{ .Env.DEFAULT_ENCRYPTION_KEY }}
 
 release:

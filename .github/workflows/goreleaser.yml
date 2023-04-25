@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SNAPCRAFT_STORE_CREDENTIALS: ${{secrets.SNAPCRAFT_TOKEN}}
-      SENTRY_DSN: ${{secrets.SENTRY_DSN}}
       DEFAULT_ENCRYPTION_KEY: ${{secrets.DEFAULT_ENCRYPTION_KEY}}
 
     steps:
