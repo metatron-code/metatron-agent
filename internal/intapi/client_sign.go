@@ -14,7 +14,8 @@ func (c *HTTPClient) GetAuthRequestSign(method, path string, timestamp int64) (s
 	timestampStr := fmt.Sprintf("%d", timestamp)
 	agentID := c.agentID.String()
 
-	nonce := sha256.Sum256([]byte(fmt.Sprintf("%s/%s/%s", timestampStr, c.appVersion, c.appCommit)))
+	nonceStr := fmt.Sprintf("%s/%s/%s", timestampStr, c.appVersion, c.appCommit)
+	nonce := sha256.Sum256([]byte(nonceStr))
 
 	var b bytes.Buffer
 	b.Write(nonce[:])

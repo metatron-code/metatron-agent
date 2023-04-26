@@ -111,7 +111,8 @@ func (app *App) requestAuthConfig() (*AuthConfig, error) {
 
 	conf := &AuthConfig{}
 
-	if resp.StatusCode == http.StatusOK {
+	switch resp.StatusCode {
+	case http.StatusOK:
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
@@ -124,6 +125,12 @@ func (app *App) requestAuthConfig() (*AuthConfig, error) {
 		if conf != nil {
 			return conf, nil
 		}
+
+	case http.StatusUnauthorized:
+		return nil, fmt.Errorf("error connect to int-api: %d", http.StatusUnauthorized)
+
+	case http.StatusInternalServerError:
+		return nil, fmt.Errorf("error connect to int-api: %d", http.StatusUnauthorized)
 	}
 
 	return nil, nil
@@ -161,6 +168,9 @@ func (app *App) verifyAuthConfig(conf *AuthConfig) (bool, error) {
 				return true, nil
 			}
 		}
+
+	case http.StatusUnauthorized:
+		return false, fmt.Errorf("error connect to int-api")
 
 	case http.StatusForbidden:
 		return false, fmt.Errorf("agent was blocked")
