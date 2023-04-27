@@ -22,6 +22,8 @@ type App struct {
 	metaDate    string
 
 	defaultEncryptPassword string
+
+	shadowUpdated bool
 }
 
 func New(version, commit, date string) (*App, error) {

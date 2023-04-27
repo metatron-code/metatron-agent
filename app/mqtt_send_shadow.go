@@ -36,6 +36,18 @@ func (app *App) mqttSendShadow() {
 		log.Println("error publish:", err)
 		app.mqttErrors++
 	}
+
+	for i := 0; i < 10; i++ {
+		time.Sleep(time.Second)
+
+		if app.shadowUpdated {
+			return
+		}
+	}
+
+	if !app.shadowUpdated {
+		app.mqttForceSendShadow()
+	}
 }
 
 func (app *App) mqttEventShadow(msg *paho.Publish) {
@@ -93,4 +105,36 @@ func (app *App) mqttEventShadow(msg *paho.Publish) {
 			app.mqttErrors++
 		}
 	}
+
+	app.shadowUpdated = true
+}
+
+func (app *App) mqttForceSendShadow() {
+	sendData := shadowData{}
+	sendData.State.Reported = shadowReported{
+		Version: app.metaVersion,
+		EnvOS:   runtime.GOOS,
+		EnvArch: runtime.GOARCH,
+	}
+
+	sendDataBytes, err := json.Marshal(sendData)
+	if err != nil {
+		log.Println("error marshal shadow data:", err)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	msg := &paho.Publish{
+		Topic:   fmt.Sprintf("$aws/things/%s/shadow/update", app.mqttAuthConf.ThingName),
+		Payload: sendDataBytes,
+	}
+
+	if _, err := app.mqtt.Publish(ctx, msg); err != nil {
+		log.Println("error publish:", err)
+		app.mqttErrors++
+	}
+
+	app.shadowUpdated = true
 }
