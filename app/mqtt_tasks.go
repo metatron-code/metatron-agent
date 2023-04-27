@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/eclipse/paho.golang/paho"
+	"github.com/google/uuid"
 	"github.com/metatron-code/metatron-agent/internal/tasks"
 )
 
@@ -36,6 +37,11 @@ func (app *App) mqttEventTask(msg *paho.Publish) {
 
 	if err := json.Unmarshal(msg.Payload, &task); err != nil {
 		log.Println("error unmarshal message:", err)
+		return
+	}
+
+	if _, err := uuid.Parse(task.ID); err != nil {
+		log.Println("error parse task id:", err)
 		return
 	}
 
