@@ -12,9 +12,11 @@ import (
 )
 
 type shadowData struct {
-	State struct {
-		Reported shadowReported `json:"reported"`
-	} `json:"state"`
+	State shadowState `json:"state"`
+}
+
+type shadowState struct {
+	Reported shadowReported `json:"reported"`
 }
 
 type shadowReported struct {
@@ -62,29 +64,28 @@ func (app *App) mqttEventShadow(msg *paho.Publish) {
 		return
 	}
 
-	localShadow := shadowReported{
-		Version: app.metaVersion,
-		EnvOS:   runtime.GOOS,
-		EnvArch: runtime.GOARCH,
-	}
+	localShadow := getShadowData(app.metaVersion)
 
-	if localShadow != remote.State.Reported {
+	if localShadow.State.Reported != remote.State.Reported {
 		sendShadow := shadowReported{}
 
-		if remote.State.Reported.Version != localShadow.Version {
-			sendShadow.Version = localShadow.Version
+		if remote.State.Reported.Version != localShadow.State.Reported.Version {
+			sendShadow.Version = localShadow.State.Reported.Version
 		}
 
-		if remote.State.Reported.EnvOS != localShadow.EnvOS {
-			sendShadow.EnvOS = localShadow.EnvOS
+		if remote.State.Reported.EnvOS != localShadow.State.Reported.EnvOS {
+			sendShadow.EnvOS = localShadow.State.Reported.EnvOS
 		}
 
-		if remote.State.Reported.EnvArch != localShadow.EnvArch {
-			sendShadow.EnvArch = localShadow.EnvArch
+		if remote.State.Reported.EnvArch != localShadow.State.Reported.EnvArch {
+			sendShadow.EnvArch = localShadow.State.Reported.EnvArch
 		}
 
-		sendData := shadowData{}
-		sendData.State.Reported = sendShadow
+		sendData := shadowData{
+			State: shadowState{
+				Reported: sendShadow,
+			},
+		}
 
 		sendDataBytes, err := json.Marshal(sendData)
 		if err != nil {
@@ -110,12 +111,7 @@ func (app *App) mqttEventShadow(msg *paho.Publish) {
 }
 
 func (app *App) mqttForceSendShadow() {
-	sendData := shadowData{}
-	sendData.State.Reported = shadowReported{
-		Version: app.metaVersion,
-		EnvOS:   runtime.GOOS,
-		EnvArch: runtime.GOARCH,
-	}
+	sendData := getShadowData(app.metaVersion)
 
 	sendDataBytes, err := json.Marshal(sendData)
 	if err != nil {
@@ -137,4 +133,16 @@ func (app *App) mqttForceSendShadow() {
 	}
 
 	app.shadowUpdated = true
+}
+
+func getShadowData(version string) shadowData {
+	return shadowData{
+		State: shadowState{
+			Reported: shadowReported{
+				Version: version,
+				EnvOS:   runtime.GOOS,
+				EnvArch: runtime.GOARCH,
+			},
+		},
+	}
 }
