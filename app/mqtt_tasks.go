@@ -77,6 +77,9 @@ func (app *App) mqttEventTask(msg *paho.Publish) {
 			log.Println("error make response:", err)
 		}
 
+	case "int-update-shadow":
+		app.mqttForceSendShadow()
+
 	default:
 		if len(task.Type) > 1 {
 			log.Println("unknown task type:", task.Type)
