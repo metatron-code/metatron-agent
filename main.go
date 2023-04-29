@@ -8,10 +8,6 @@ import (
 )
 
 var (
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
-
 	defaultEncryptPassword = "qwerty"
 )
 
@@ -23,7 +19,7 @@ func init() {
 }
 
 func main() {
-	agent, err := app.New(version, commit, date)
+	agent, err := app.New()
 	if err != nil {
 		log.Println("error app initialization:", err)
 		return

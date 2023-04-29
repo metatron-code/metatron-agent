@@ -17,21 +17,14 @@ type App struct {
 
 	startTime time.Time
 
-	metaVersion string
-	metaCommit  string
-	metaDate    string
-
 	defaultEncryptPassword string
 
 	shadowUpdated bool
 }
 
-func New(version, commit, date string) (*App, error) {
+func New() (*App, error) {
 	app := &App{
-		cvmAddress:  "4w8lflsa93.execute-api.eu-west-1.amazonaws.com",
-		metaVersion: version,
-		metaCommit:  commit,
-		metaDate:    date,
+		cvmAddress: "4w8lflsa93.execute-api.eu-west-1.amazonaws.com",
 
 		startTime: time.Now(),
 	}

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/eclipse/paho.golang/paho"
+	"github.com/metatron-code/metatron-agent/internal/vars"
 )
 
 type state struct {
@@ -31,7 +32,7 @@ func (app *App) mqttSendState() {
 				AgentID:   app.config.AgentUUID.String(),
 				Connected: time.Now().Unix(),
 				Uptime:    int64(time.Since(app.startTime).Seconds()),
-				Version:   app.metaVersion,
+				Version:   vars.Version,
 			}
 
 			dataBytes, err := json.Marshal(data)

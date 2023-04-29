@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/eclipse/paho.golang/paho"
+	"github.com/metatron-code/metatron-agent/internal/vars"
 )
 
 type shadowData struct {
@@ -64,7 +65,7 @@ func (app *App) mqttEventShadow(msg *paho.Publish) {
 		return
 	}
 
-	localShadow := getShadowData(app.metaVersion)
+	localShadow := getShadowData()
 
 	if localShadow.State.Reported != remote.State.Reported {
 		sendShadow := shadowReported{}
@@ -111,7 +112,7 @@ func (app *App) mqttEventShadow(msg *paho.Publish) {
 }
 
 func (app *App) mqttForceSendShadow() {
-	sendData := getShadowData(app.metaVersion)
+	sendData := getShadowData()
 
 	sendDataBytes, err := json.Marshal(sendData)
 	if err != nil {
@@ -135,11 +136,11 @@ func (app *App) mqttForceSendShadow() {
 	app.shadowUpdated = true
 }
 
-func getShadowData(version string) shadowData {
+func getShadowData() shadowData {
 	return shadowData{
 		State: shadowState{
 			Reported: shadowReported{
-				Version: version,
+				Version: vars.Version,
 				EnvOS:   runtime.GOOS,
 				EnvArch: runtime.GOARCH,
 			},

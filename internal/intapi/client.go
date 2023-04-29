@@ -20,11 +20,11 @@ type HTTPClient struct {
 	signKey string
 }
 
-func NewHTTPClient(version, commit string, agentID uuid.UUID) *HTTPClient {
+func NewHTTPClient(agentID uuid.UUID) *HTTPClient {
 	return &HTTPClient{
 		agentID:    agentID,
-		appVersion: version,
-		appCommit:  commit,
+		appVersion: vars.Version,
+		appCommit:  vars.Commit,
 
 		signKey: vars.SignKey,
 	}
@@ -32,6 +32,14 @@ func NewHTTPClient(version, commit string, agentID uuid.UUID) *HTTPClient {
 
 func (c *HTTPClient) SetSignKey(key string) {
 	c.signKey = key
+}
+
+func (c *HTTPClient) SetVersion(version string) {
+	c.appVersion = version
+}
+
+func (c *HTTPClient) SetCommit(commit string) {
+	c.appCommit = commit
 }
 
 func (c *HTTPClient) Get(url string) (*http.Response, error) {

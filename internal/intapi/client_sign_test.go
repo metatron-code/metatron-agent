@@ -17,9 +17,11 @@ func TestGetAuthRequestSign(t *testing.T) {
 
 	var timestamp int64 = 1682466181
 
-	client := NewHTTPClient("0.1.2", "87f173b54157ab59626dd7692f4f317612a98a7f", agentID)
+	client := NewHTTPClient(agentID)
 
 	client.SetSignKey("-7sSHnpPQl3gq27jyu8qdl_gtZphGFgc")
+	client.SetVersion("0.1.2")
+	client.SetCommit("87f173b54157ab59626dd7692f4f317612a98a7f")
 
 	sign, err := client.GetAuthRequestSign(http.MethodGet, "/", timestamp)
 	if err != nil {
