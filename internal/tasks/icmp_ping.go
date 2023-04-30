@@ -27,6 +27,7 @@ type IcmpPingResponse struct {
 	AvgRtt                float64   `json:"avg_rtt"`
 	StdDevRtt             float64   `json:"std_dev_rtt"`
 	Rtts                  []float64 `json:"rtts"`
+	Jitter                float64   `json:"jitter"`
 }
 
 func NewIcmpPing(params []byte) (*IcmpPing, error) {
@@ -77,8 +78,14 @@ func (t *IcmpPing) Run(timeout time.Duration) ([]byte, error) {
 		AvgRtt: stats.AvgRtt.Seconds(),
 	}
 
-	for _, row := range stats.Rtts {
-		resp.Rtts = append(resp.Rtts, row.Seconds())
+	if stats.Rtts != nil {
+		var rttsSum float64
+		for _, row := range stats.Rtts {
+			resp.Rtts = append(resp.Rtts, row.Seconds())
+			rttsSum += row.Seconds()
+		}
+
+		resp.Jitter = rttsSum / float64(len(stats.Rtts))
 	}
 
 	respByte, err := json.Marshal(resp)
