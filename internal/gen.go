@@ -3,13 +3,24 @@
 package main
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 )
+
+type sendReleaseInfo struct {
+	AppName    string `json:"app_name"`
+	AppVersion string `json:"app_version"`
+	Commit     string `json:"commit"`
+	SignKey    string `json:"sign_key"`
+}
 
 func main() {
 	signKeyBytes := make([]byte, 24)
@@ -23,7 +34,7 @@ func main() {
 package vars
 
 var (
-	SignKey = "{{ .SignKey}}"
+	SignKey = "{{ .SignKey }}"
 )
 	`)))
 
@@ -32,11 +43,44 @@ var (
 		log.Fatal(err)
 	}
 
-	defer f.Close()
-
 	packageTemplate.Execute(f, struct {
 		SignKey string
 	}{
 		SignKey: signKey,
 	})
+
+	f.Close()
+
+	if os.Getenv("GITHUB_REF_TYPE") != "tag" {
+		return
+	}
+
+	send := sendReleaseInfo{
+		AppName: "metatron-agent",
+		Commit:  os.Getenv("GITHUB_SHA"),
+		SignKey: signKey,
+	}
+
+	send.AppVersion = strings.TrimPrefix(os.Getenv("GITHUB_REF"), "refs/tags/v")
+
+	body, err := json.Marshal(send)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req, err := http.NewRequest(http.MethodPost, os.Getenv("RELEASE_NOTIFY_URL"), bytes.NewReader(body))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Key %s", os.Getenv("RELEASE_AUTH_KEY")))
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		log.Fatal("err put release info")
+	}
 }
