@@ -18,8 +18,8 @@ builds:
     ldflags:
       - -s -w
       - -X github.com/metatron-code/metatron-agent/internal/vars.Version={{.Version}}
-      - -X github.com/metatron-code/metatron-agent/internal/vars.commit={{.Commit}}
-      - -X main.defaultEncryptPassword={{ .Env.DEFAULT_ENCRYPTION_KEY }}
+      - -X github.com/metatron-code/metatron-agent/internal/vars.Commit={{.Commit}}
+      - -X github.com/metatron-code/metatron-agent/internal/vars.DefaultEncryptPassword={{ .Env.DEFAULT_ENCRYPTION_KEY }}
 
 release:
   skip_upload: true

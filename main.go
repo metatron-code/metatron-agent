@@ -7,10 +7,6 @@ import (
 	"github.com/metatron-code/metatron-agent/app"
 )
 
-var (
-	defaultEncryptPassword = "qwerty"
-)
-
 //go:generate go run ./internal/gen.go
 
 func init() {
@@ -24,8 +20,6 @@ func main() {
 		log.Println("error app initialization:", err)
 		return
 	}
-
-	agent.SetDefaultEncryptPassword(defaultEncryptPassword)
 
 	if err := agent.Execute(); err != nil {
 		log.Println("error execute app:", err)

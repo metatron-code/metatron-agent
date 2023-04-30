@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/eclipse/paho.golang/autopaho"
+	"github.com/metatron-code/metatron-agent/internal/vars"
 )
 
 type App struct {
@@ -27,6 +28,8 @@ func New() (*App, error) {
 		cvmAddress: "4w8lflsa93.execute-api.eu-west-1.amazonaws.com",
 
 		startTime: time.Now(),
+
+		defaultEncryptPassword: vars.DefaultEncryptPassword,
 	}
 
 	var okRootPath bool
