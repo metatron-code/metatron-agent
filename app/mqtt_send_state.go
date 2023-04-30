@@ -4,10 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/eclipse/paho.golang/paho"
+	"github.com/metatron-code/metatron-agent/internal/intapi"
 	"github.com/metatron-code/metatron-agent/internal/vars"
 )
 
@@ -16,10 +20,13 @@ type state struct {
 	Connected int64  `json:"connected"`
 	Uptime    int64  `json:"uptime"`
 	Version   string `json:"app_version"`
+
+	IPInfo map[string]string `json:"ip_info"`
 }
 
 func (app *App) mqttSendState() {
-	willMessageExpiry := uint32(5 * 60)
+	delay := 3
+	willMessageExpiry := uint32((delay * 3) * 60)
 
 	for {
 		if app.mqtt == nil {
@@ -33,6 +40,13 @@ func (app *App) mqttSendState() {
 				Connected: time.Now().Unix(),
 				Uptime:    int64(time.Since(app.startTime).Seconds()),
 				Version:   vars.Version,
+			}
+
+			ipInfo, err := app.getIPInfo()
+			if err != nil {
+				log.Println("error get ip info:", err.Error())
+			} else {
+				data.IPInfo = ipInfo
 			}
 
 			dataBytes, err := json.Marshal(data)
@@ -60,6 +74,34 @@ func (app *App) mqttSendState() {
 			}
 		}()
 
-		time.Sleep(3 * time.Minute)
+		time.Sleep(time.Duration(delay) * time.Minute)
 	}
+}
+
+func (app *App) getIPInfo() (map[string]string, error) {
+	client := intapi.NewHTTPClient(app.config.AgentUUID)
+
+	endpoint := &url.URL{Scheme: "https", Host: app.intAPIAddress, Path: "/ipinfo"}
+
+	resp, err := client.Get(endpoint.String())
+	if err != nil {
+		return nil, err
+	}
+
+	var data map[string]string
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error status code for get IP info")
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal(body, &data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

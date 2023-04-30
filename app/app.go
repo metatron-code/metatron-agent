@@ -11,7 +11,10 @@ import (
 type App struct {
 	config       config
 	rootFilePath string
-	cvmAddress   string
+
+	cvmAddress    string
+	intAPIAddress string
+
 	mqtt         *autopaho.ConnectionManager
 	mqttAuthConf *AuthConfig
 	mqttErrors   int
@@ -25,7 +28,8 @@ type App struct {
 
 func New() (*App, error) {
 	app := &App{
-		cvmAddress: "4w8lflsa93.execute-api.eu-west-1.amazonaws.com",
+		cvmAddress:    "4w8lflsa93.execute-api.eu-west-1.amazonaws.com",
+		intAPIAddress: "z2xzt7xf18.execute-api.eu-west-1.amazonaws.com",
 
 		startTime: time.Now(),
 
