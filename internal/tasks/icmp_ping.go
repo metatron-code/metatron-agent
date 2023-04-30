@@ -23,7 +23,7 @@ type IcmpPingResponse struct {
 	IPAddr                string    `json:"ip_address"`
 	Addr                  string    `json:"address"`
 	MinRtt                float64   `json:"min_rtt"`
-	MaxRtt                float64   `json:"maxrtt"`
+	MaxRtt                float64   `json:"max_rtt"`
 	AvgRtt                float64   `json:"avg_rtt"`
 	StdDevRtt             float64   `json:"std_dev_rtt"`
 	Rtts                  []float64 `json:"rtts"`
