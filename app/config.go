@@ -15,7 +15,7 @@ type config struct {
 }
 
 func (app *App) loadBaseConfig() error {
-	confFile := path.Join(app.rootFilePath, "conf.dat")
+	confFile := path.Join(app.rootFilePath, "conf_v1.dat")
 
 	var conf config
 
@@ -72,7 +72,7 @@ start:
 }
 
 func (app *App) removeOldConfigFiles() error {
-	for _, name := range []string{"hw.uid"} {
+	for _, name := range []string{"hw.uid", "conf.dat", "auth.dat"} {
 		confFile := path.Join(app.rootFilePath, name)
 
 		if _, err := os.Stat(confFile); err == nil {

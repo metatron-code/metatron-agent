@@ -25,7 +25,7 @@ type AuthConfig struct {
 }
 
 func (app *App) loadAuthConfig() (*AuthConfig, error) {
-	confFile := path.Join(app.rootFilePath, "auth.dat")
+	confFile := path.Join(app.rootFilePath, "auth_v1.dat")
 
 start:
 	if _, err := os.Stat(confFile); os.IsNotExist(err) {
