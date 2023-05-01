@@ -31,25 +31,25 @@ start:
 	if _, err := os.Stat(confFile); os.IsNotExist(err) {
 		conf, err := app.requestAuthConfig()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("ERR-AUTH-01: %s", err.Error())
 		}
 
 		if conf != nil {
 			data, err := json.Marshal(conf)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("ERR-AUTH-02: %s", err.Error())
 			}
 
 			dataEncrypted, err := tools.EncryptBytes(data, app.config.AgentUUID.String())
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("ERR-AUTH-03: %s", err.Error())
 			}
 
 			encoded := base64.RawURLEncoding.EncodeToString(dataEncrypted)
 
 			if err := os.WriteFile(confFile, []byte(encoded), 0600); err != nil {
 				if err != nil {
-					return nil, err
+					return nil, fmt.Errorf("ERR-AUTH-04: %s", err.Error())
 				}
 			}
 		}
@@ -59,18 +59,18 @@ start:
 
 	confData, err := os.ReadFile(confFile)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ERR-AUTH-05: %s", err.Error())
 	}
 
 	dataEncrypted, err := base64.RawURLEncoding.DecodeString(string(confData))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ERR-AUTH-06: %s", err.Error())
 	}
 
 	data, err := tools.DecryptBytes(dataEncrypted, app.config.AgentUUID.String())
 	if err != nil {
 		if err := os.Remove(confFile); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("ERR-AUTH-07: %s", err.Error())
 		}
 
 		goto start
@@ -86,7 +86,7 @@ start:
 
 	} else if !verified {
 		if err := os.Remove(confFile); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("ERR-AUTH-08: %s", err.Error())
 		}
 
 		goto start
@@ -106,7 +106,7 @@ func (app *App) requestAuthConfig() (*AuthConfig, error) {
 
 	resp, err := client.Get(endpoint.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ERR-AUTH-09: %s", err.Error())
 	}
 
 	conf := &AuthConfig{}
@@ -115,11 +115,11 @@ func (app *App) requestAuthConfig() (*AuthConfig, error) {
 	case http.StatusOK:
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("ERR-AUTH-10: %s", err.Error())
 		}
 
 		if err := json.Unmarshal(body, &conf); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("ERR-AUTH-11: %s", err.Error())
 		}
 
 		if conf != nil {
@@ -147,7 +147,7 @@ func (app *App) verifyAuthConfig(conf *AuthConfig) (bool, error) {
 
 	resp, err := client.Get(endpoint.String())
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("ERR-AUTH-12: %s", err.Error())
 	}
 
 	switch resp.StatusCode {
@@ -156,11 +156,11 @@ func (app *App) verifyAuthConfig(conf *AuthConfig) (bool, error) {
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("ERR-AUTH-13: %s", err.Error())
 		}
 
 		if err := json.Unmarshal(body, &data); err != nil {
-			return false, err
+			return false, fmt.Errorf("ERR-AUTH-14: %s", err.Error())
 		}
 
 		if certID, ok := data["certificate_id"]; ok {
