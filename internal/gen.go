@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -56,12 +57,15 @@ var (
 	}
 
 	send := sendReleaseInfo{
-		AppName: "metatron-agent",
-		Commit:  os.Getenv("GITHUB_SHA"),
-		SignKey: signKey,
+		AppName:    "metatron-agent",
+		Commit:     os.Getenv("GITHUB_SHA"),
+		SignKey:    signKey,
+		AppVersion: strings.TrimPrefix(os.Getenv("GITHUB_REF"), "refs/tags/v"),
 	}
 
-	send.AppVersion = strings.TrimPrefix(os.Getenv("GITHUB_REF"), "refs/tags/v")
+	if strings.HasPrefix(send.AppVersion, "refs/tags/") {
+		send.AppVersion = strings.TrimPrefix(send.AppVersion, "refs/tags/")
+	}
 
 	body, err := json.Marshal(send)
 	if err != nil {
@@ -73,7 +77,8 @@ var (
 		log.Fatal(err)
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Key %s", os.Getenv("RELEASE_AUTH_KEY")))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("SToken %s", os.Getenv("RELEASE_AUTH_KEY")))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -81,6 +86,11 @@ var (
 	}
 
 	if resp.StatusCode != http.StatusCreated {
-		log.Fatal("err put release info")
+		body, err := io.ReadAll(resp.Body)
+		if err == nil {
+			log.Fatalf("err put release info, http-code: %d, error: %s", resp.StatusCode, string(body))
+		}
 	}
+
+	req.Body.Close()
 }
