@@ -2,6 +2,7 @@ package ipinfo
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/metatron-code/metatron-agent/internal/exthttp"
 )
@@ -37,5 +38,7 @@ func GetIPInfo() (*Info, error) {
 		Country: info.Country,
 		Region:  info.Region,
 		City:    info.City,
+
+		CheckedON: time.Now().Unix(),
 	}, nil
 }
