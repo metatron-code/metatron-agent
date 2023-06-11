@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/eclipse/paho.golang v0.11.0
 	github.com/google/uuid v1.3.0
-	github.com/prometheus-community/pro-bing v0.1.0
+	github.com/prometheus-community/pro-bing v0.2.0
 	golang.org/x/exp v0.0.0-20230420155640-133eef4313cb
 )
 
